@@ -14,8 +14,9 @@ let allEvents    = [];          // flat array of GCal event objects (decorated)
 let selectedIds  = new Set();   // currently visible calendar IDs
 
 // Layout constants for event rows
-const LANE_H   = 16;  // height of each event bar / dot row (px)
-const LANE_GAP = 3;   // vertical gap between lanes (px)
+const LANE_H    = 16;  // height of each event bar / dot row (px)
+const LANE_GAP  = 3;   // vertical gap between lanes (px)
+const MAX_LANES = 3;   // max visible lanes per week row (overflow → "+N more")
 
 // ── Google API bootstrap ──────────────────────────────────────
 
@@ -325,19 +326,20 @@ function buildEventsLayer(events, weekDates) {
     const endCol     = clampE.getDay();  // 0–6
     const startsHere = s >= wStart;
     const endsHere   = e <= wEnd;
-    const isMulti    = s.getTime() !== e.getTime(); // truly spans >1 day
+    const isMulti    = s.getTime() !== e.getTime();
 
     return { ev, startCol, endCol, startsHere, endsHere, isMulti };
   });
 
-  // Sort: earlier start first; longer span first on ties (fills wider lanes)
+  // Sort: multi-day bars first (they get the top lanes), then by start, then by span
   items.sort((a, b) =>
+    (b.isMulti ? 1 : 0) - (a.isMulti ? 1 : 0) ||
     a.startCol - b.startCol ||
     (b.endCol - b.startCol) - (a.endCol - a.startCol)
   );
 
   // Lane assignment: greedy, lowest available lane
-  const laneEnds = []; // laneEnds[i] = endCol of last event assigned to lane i
+  const laneEnds = [];
   items.forEach(item => {
     let lane = laneEnds.findIndex(end => end < item.startCol);
     if (lane === -1) lane = laneEnds.length;
@@ -345,62 +347,46 @@ function buildEventsLayer(events, weekDates) {
     item.lane = lane;
   });
 
-  const numLanes   = laneEnds.length;
-  const layerH     = numLanes * (LANE_H + LANE_GAP) + LANE_GAP;
+  // Cap at MAX_LANES — count hidden items
+  const visible     = items.filter(d => d.lane < MAX_LANES);
+  const hiddenCount = items.length - visible.length;
+
+  const layerH = MAX_LANES * (LANE_H + LANE_GAP) + LANE_GAP +
+                 (hiddenCount > 0 ? 13 : 0); // extra row for "+N more"
 
   const layer = document.createElement('div');
-  layer.className   = 'events-layer';
+  layer.className    = 'events-layer';
   layer.style.height = layerH + 'px';
 
-  items.forEach(({ ev, startCol, endCol, startsHere, endsHere, isMulti, lane }) => {
-    const top    = lane * (LANE_H + LANE_GAP) + LANE_GAP;
-    const title  = ev.summary || '(No title)';
-    const s      = evStart(ev);
-    const e      = evEnd(ev);
-    const tip    = `${title}\n${fmtRange(s, e)}\n📅 ${ev._calName}`;
+  visible.forEach(({ ev, startCol, endCol, startsHere, endsHere, isMulti, lane }) => {
+    const top   = lane * (LANE_H + LANE_GAP) + LANE_GAP;
+    const title = ev.summary || '(No title)';
+    const s     = evStart(ev);
+    const e     = evEnd(ev);
+    const tip   = `${title}\n${fmtRange(s, e)}\n📅 ${ev._calName}`;
 
     if (isMulti) {
-      // ── Multi-day event → coloured bar ──
       const bar = document.createElement('div');
       bar.className = 'event-bar';
 
-      // Left edge
-      if (startsHere) {
-        bar.style.left = pct(startCol / 7);
-      } else {
-        bar.style.left = '0';
-      }
-
-      // Right edge
-      if (endsHere) {
-        bar.style.right = pct((6 - endCol) / 7);
-      } else {
-        bar.style.right = '0';
-      }
-
+      bar.style.left = startsHere ? pct(startCol / 7) : '0';
+      bar.style.right = endsHere  ? pct((6 - endCol) / 7) : '0';
       bar.style.top        = top + 'px';
       bar.style.background = ev._calColor;
 
-      // Border radius: round the ends that terminate here
       const tl = startsHere ? '4px' : '0';
       const tr = endsHere   ? '4px' : '0';
       bar.style.borderRadius = `${tl} ${tr} ${tr} ${tl}`;
-
-      // Label: show event name only where it "starts" in the visible portion
       bar.textContent = title;
 
       bar.addEventListener('mouseenter', e => showTip(e, tip));
       bar.addEventListener('mouseleave', hideTip);
       bar.addEventListener('click',      ()  => openEvent(ev));
-
       layer.appendChild(bar);
 
     } else {
-      // ── Single-day event → small dot with hover tooltip ──
       const dot = document.createElement('div');
-      dot.className = 'event-dot';
-
-      // Centre horizontally in the column
+      dot.className        = 'event-dot';
       dot.style.left       = pct((startCol + 0.5) / 7);
       dot.style.top        = (top + Math.floor((LANE_H - 7) / 2)) + 'px';
       dot.style.background = ev._calColor;
@@ -408,10 +394,18 @@ function buildEventsLayer(events, weekDates) {
       dot.addEventListener('mouseenter', e => showTip(e, tip));
       dot.addEventListener('mouseleave', hideTip);
       dot.addEventListener('click',      ()  => openEvent(ev));
-
       layer.appendChild(dot);
     }
   });
+
+  // "+N more" label for overflow
+  if (hiddenCount > 0) {
+    const more = document.createElement('div');
+    more.className   = 'event-more';
+    more.textContent = `+${hiddenCount} more`;
+    more.style.top   = (MAX_LANES * (LANE_H + LANE_GAP) + LANE_GAP + 1) + 'px';
+    layer.appendChild(more);
+  }
 
   return layer;
 }

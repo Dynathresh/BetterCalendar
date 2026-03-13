@@ -326,28 +326,26 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
   cursor: pointer;
-  /* Text hidden by default — bar shows as a clean colour strip */
-  color: transparent;
-  text-shadow: none;
-  opacity: .88;
-  transition: color .12s, text-shadow .12s, opacity .12s, filter .12s;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+  opacity: .92;
+  transition: opacity .12s, filter .12s;
   z-index: 1;
 }
-
-/* Reveal text on hover */
 .event-bar:hover {
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,.3);
   opacity: 1;
-  filter: brightness(1.06);
+  filter: brightness(1.08);
   z-index: 5;
 }
 
-/* Reveal ALL labels while Alt is held (body gets .labels-on class) */
-body.labels-on .event-bar {
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,.3);
-  opacity: 1;
+/* ── Overflow indicator ──────────────────────────────────────── */
+.event-more {
+  position: absolute;
+  font-size: 9px;
+  color: var(--text-muted);
+  left: 3px;
+  cursor: default;
+  white-space: nowrap;
 }
 
 /* ── Event dot (single-day) ──────────────────────────────────── */
