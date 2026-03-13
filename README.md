@@ -20,7 +20,9 @@ A clean, 12-month year-at-a-glance view of your Google Calendar — built specif
 
 ## Setup — two parts
 
-### Part 1 — Google Cloud credentials (~10 min, one time)
+> **🔒 Security note:** No API key is required. The only thing you put in `config.js` is your OAuth **Client ID**, which is intentionally public for client-side web apps — Google restricts it to only work from your authorised domain, so it cannot be misused by anyone who sees it in your repo.
+
+### Part 1 — Google Cloud credentials (~8 min, one time)
 
 #### Step 1 · Create a Google Cloud project
 
@@ -42,11 +44,11 @@ A clean, 12-month year-at-a-glance view of your Google Calendar — built specif
    - App name: `BetterCalendar`
    - User support email: your email
    - Developer contact: your email
-4. Click **Save and Continue** through the remaining steps (you can skip Scopes, Test Users for now)
+4. Click **Save and Continue** through the remaining steps (you can skip Scopes and Test Users)
 5. Back on the OAuth consent screen dashboard, click **Publish App** → **Confirm**
    *(This lets you sign in without being added as a test user)*
 
-> **Note:** Google may show a warning screen on sign-in ("This app isn't verified") — this is normal for personal tools. Click **Advanced → Go to BetterCalendar (unsafe)** to proceed.
+> **Note:** Google may show a warning screen on sign-in ("This app isn't verified") — this is completely normal for personal tools. Click **Advanced → Go to BetterCalendar (unsafe)** to proceed.
 
 #### Step 4 · Create an OAuth 2.0 Client ID
 
@@ -62,43 +64,32 @@ A clean, 12-month year-at-a-glance view of your Google Calendar — built specif
 7. Copy the **Client ID** — it looks like:
    `123456789012-abcdefg.apps.googleusercontent.com`
 
-#### Step 5 · Create an API Key
-
-1. **APIs & Services → Credentials → + Create Credentials → API key**
-2. Copy the key (it looks like `AIzaSy...`)
-3. *(Optional but recommended)* Click **Edit API key** → restrict it to **Google Calendar API**
+That's it — **no API key needed**.
 
 ---
 
 ### Part 2 — Add credentials & deploy
 
-#### Step 6 · Add your credentials to config.js
+#### Step 5 · Add your Client ID to config.js
 
-Open `config.js` and replace the placeholder values:
+Open `config.js` and replace the placeholder:
 
 ```js
 const CONFIG = {
   CLIENT_ID: 'YOUR_ACTUAL_CLIENT_ID.apps.googleusercontent.com',
-  API_KEY:   'YOUR_ACTUAL_API_KEY',
 };
 ```
 
-#### Step 7 · Push to GitHub
+#### Step 6 · Commit and push your updated config.js
 
 ```bash
 cd "/Users/msun/Desktop/Productivity Projects/BetterCalendar"
-
-git init
-git remote add origin https://github.com/Dynathresh/BetterCalendar.git
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git push -u origin main
+git add config.js
+git commit -m "Add Google OAuth Client ID"
+git push
 ```
 
-*(If you already initialised the repo on GitHub, you may need `git pull origin main --allow-unrelated-histories` first.)*
-
-#### Step 8 · Enable GitHub Pages
+#### Step 7 · Enable GitHub Pages
 
 1. Go to your repo on GitHub → **Settings → Pages**
 2. Under **Source**: select **Deploy from a branch**

@@ -21,11 +21,10 @@ const LANE_GAP = 3;   // vertical gap between lanes (px)
 
 /** Called by the GAPI <script> onload */
 function gapiLoaded() {
-  gapi.load('client', async () => {
-    await gapi.client.init({
-      apiKey: CONFIG.API_KEY,
-      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-    });
+  // We intentionally do NOT pass an apiKey or discoveryDocs here.
+  // The Calendar API discovery doc is loaded after the user authenticates
+  // (using their OAuth token), so no API key is ever needed.
+  gapi.load('client', () => {
     gapiInited = true;
     checkReady();
   });
@@ -96,6 +95,8 @@ async function loadAndRender() {
   setLoading(true);
   clearError();
   try {
+    // Load the Calendar API discovery doc using the OAuth token (no API key needed)
+    await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest');
     await loadCalendars();
     await loadEvents();
     renderYearView();
