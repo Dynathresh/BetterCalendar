@@ -44,7 +44,12 @@ function gisLoaded() {
 
 function checkReady() {
   if (gapiInited && gisInited) {
-    document.getElementById('signin-btn').disabled = false;
+    el('signin-btn').disabled = false;
+    // If user has signed in before, try to get a token silently on load
+    // (works as long as the Google session cookie is still valid)
+    if (localStorage.getItem('bc_signed_in') === '1') {
+      tokenClient.requestAccessToken({ prompt: '' });
+    }
   }
 }
 
@@ -68,10 +73,16 @@ function signOut() {
 
 async function onTokenReceived(resp) {
   if (resp.error) {
+    // If the silent auto-attempt requires interaction (user not signed in to Google),
+    // just leave the Sign In button visible — don't show an error.
+    const silent = ['access_denied', 'interaction_required',
+                    'user_interaction_required', 'immediate_failed'];
+    if (silent.includes(resp.error)) return;
     console.error('Auth error:', resp);
     showError('Sign-in failed: ' + (resp.error_description || resp.error));
     return;
   }
+  localStorage.setItem('bc_signed_in', '1'); // remember for next load
   el('signin-btn').style.display  = 'none';
   el('signout-btn').style.display = '';
   el('welcome').style.display     = 'none';
@@ -79,6 +90,7 @@ async function onTokenReceived(resp) {
 }
 
 function resetUI() {
+  localStorage.removeItem('bc_signed_in'); // forget auto-sign-in
   el('signin-btn').style.display  = '';
   el('signout-btn').style.display = 'none';
   el('filter-section').style.display = 'none';
