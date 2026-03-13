@@ -14,9 +14,11 @@ let allEvents    = [];          // flat array of GCal event objects (decorated)
 let selectedIds  = new Set();   // currently visible calendar IDs
 
 // Layout constants for event rows
-const LANE_H    = 16;  // height of each event bar / dot row (px)
-const LANE_GAP  = 3;   // vertical gap between lanes (px)
-const MAX_LANES = 3;   // max visible lanes per week row (overflow → "+N more")
+const LANE_H   = 16;  // height of each event bar / dot row (px)
+const LANE_GAP = 3;   // vertical gap between lanes (px)
+// Events layer is always exactly 1 lane tall (LANE_H + 2×LANE_GAP).
+// Non-overlapping events in different columns share that lane.
+// Overflow events (same-column clashes) show as a "+N" badge.
 
 // ── Google API bootstrap ──────────────────────────────────────
 
@@ -359,19 +361,21 @@ function buildEventsLayer(events, weekDates) {
     item.lane = lane;
   });
 
-  // Cap at MAX_LANES — count hidden items
-  const visible     = items.filter(d => d.lane < MAX_LANES);
-  const hiddenCount = items.length - visible.length;
+  // Only show lane 0 — non-overlapping events in different columns share it.
+  // Events that clash with an already-placed item go to lane ≥ 1 (hidden).
+  const lane0       = items.filter(d => d.lane === 0);
+  const hiddenCount = items.length - lane0.length;
 
-  const layerH = MAX_LANES * (LANE_H + LANE_GAP) + LANE_GAP +
-                 (hiddenCount > 0 ? 13 : 0); // extra row for "+N more"
+  // Always exactly 1 lane tall
+  const layerH = LANE_H + LANE_GAP * 2;
 
   const layer = document.createElement('div');
   layer.className    = 'events-layer';
   layer.style.height = layerH + 'px';
 
-  visible.forEach(({ ev, startCol, endCol, startsHere, endsHere, isMulti, lane }) => {
-    const top   = lane * (LANE_H + LANE_GAP) + LANE_GAP;
+  const top = LANE_GAP; // single lane top offset
+
+  lane0.forEach(({ ev, startCol, endCol, startsHere, endsHere, isMulti }) => {
     const title = ev.summary || '(No title)';
     const s     = evStart(ev);
     const e     = evEnd(ev);
@@ -381,8 +385,8 @@ function buildEventsLayer(events, weekDates) {
       const bar = document.createElement('div');
       bar.className = 'event-bar';
 
-      bar.style.left = startsHere ? pct(startCol / 7) : '0';
-      bar.style.right = endsHere  ? pct((6 - endCol) / 7) : '0';
+      bar.style.left       = startsHere ? pct(startCol / 7) : '0';
+      bar.style.right      = endsHere   ? pct((6 - endCol) / 7) : '0';
       bar.style.top        = top + 'px';
       bar.style.background = ev._calColor;
 
@@ -410,12 +414,14 @@ function buildEventsLayer(events, weekDates) {
     }
   });
 
-  // "+N more" label for overflow
+  // "+N" badge — inline, right edge of the lane
   if (hiddenCount > 0) {
     const more = document.createElement('div');
     more.className   = 'event-more';
-    more.textContent = `+${hiddenCount} more`;
-    more.style.top   = (MAX_LANES * (LANE_H + LANE_GAP) + LANE_GAP + 1) + 'px';
+    more.textContent = `+${hiddenCount}`;
+    more.style.top   = (top + Math.floor((LANE_H - 10) / 2)) + 'px';
+    more.style.right = '3px';
+    more.style.left  = 'auto';
     layer.appendChild(more);
   }
 
