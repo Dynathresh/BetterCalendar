@@ -1,0 +1,378 @@
+/* ============================================================
+   BetterCalendar — style.css
+   Light mode default · Dark mode via prefers-color-scheme
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  --bg:           #f2f2f7;
+  --surface:      #ffffff;
+  --surface2:     #f9f9fb;
+  --text:         #1c1c1e;
+  --text-muted:   #6e6e73;
+  --border:       #d1d1d6;
+  --header-bg:    #ffffff;
+  --accent:       #007aff;
+  --accent-hover: #0060df;
+  --danger:       #ff3b30;
+  --today-bg:     #007aff;
+  --today-text:   #ffffff;
+  --shadow:       0 1px 4px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
+  --radius-lg:    12px;
+  --radius-sm:    6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:         #1c1c1e;
+    --surface:    #2c2c2e;
+    --surface2:   #3a3a3c;
+    --text:       #f5f5f7;
+    --text-muted: #8e8e93;
+    --border:     #3a3a3c;
+    --header-bg:  #1c1c1e;
+    --shadow:     0 1px 4px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.04);
+  }
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.app-header {
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow);
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.app-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.4px;
+}
+
+.app-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 15px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .15s, opacity .15s;
+  white-space: nowrap;
+}
+
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover:not(:disabled) { opacity: .75; }
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+.btn-sm:hover { color: var(--text); }
+
+/* ── Filter bar ─────────────────────────────────────────────── */
+.filter-section {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.calendar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+/* Each calendar is a toggle pill (label wraps hidden checkbox) */
+.calendar-filter-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 7px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .15s, background .15s;
+  color: var(--text-muted);
+}
+.calendar-filter-item input[type="checkbox"] { display: none; }
+
+.calendar-filter-item.active {
+  background: color-mix(in srgb, var(--cal-color, #4285F4) 12%, transparent);
+  border-color: var(--cal-color, #4285F4);
+  color: var(--text);
+}
+
+.color-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Welcome screen ─────────────────────────────────────────── */
+.welcome {
+  text-align: center;
+  padding: 100px 24px 60px;
+  color: var(--text-muted);
+}
+.welcome-icon { font-size: 52px; margin-bottom: 16px; }
+.welcome h2   { font-size: 22px; color: var(--text); margin-bottom: 8px; }
+.welcome p    { font-size: 15px; line-height: 1.5; }
+.welcome-hint { margin-top: 10px; font-size: 13px; }
+
+/* ── Loading ─────────────────────────────────────────────────── */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  color: var(--text-muted);
+  gap: 14px;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error ───────────────────────────────────────────────────── */
+.error-msg {
+  margin: 20px 24px;
+  padding: 12px 16px;
+  background: var(--danger);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* ── Year view grid ─────────────────────────────────────────── */
+.year-view {
+  padding: 20px 20px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+}
+
+/* ── Month card ─────────────────────────────────────────────── */
+.month-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 14px 12px 10px;
+  box-shadow: var(--shadow);
+}
+
+.month-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  padding-left: 2px;
+}
+
+/* ── Day-of-week headers (Su Mo …) ─────────────────────────── */
+.day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 2px;
+}
+
+.day-header {
+  text-align: center;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--text-muted);
+  padding-bottom: 3px;
+}
+
+/* ── Weeks container ─────────────────────────────────────────── */
+.weeks-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Week wrapper: day-number row + events layer ─────────────── */
+.week-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Day number row */
+.day-cells {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.day-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 22px;
+}
+
+.day-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10.5px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.day-number.today {
+  background: var(--today-bg);
+  color: var(--today-text);
+  font-weight: 700;
+}
+
+/* ── Events layer (absolutely positioned bars/dots) ──────────── */
+.events-layer {
+  position: relative;
+  width: 100%;
+  /* height set dynamically by JS */
+}
+
+/* ── Event bar (multi-day) ───────────────────────────────────── */
+.event-bar {
+  position: absolute;
+  height: 16px;
+  line-height: 16px;
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 0 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  color: #fff;
+  opacity: .92;
+  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+  transition: opacity .12s, filter .12s;
+  z-index: 1;
+}
+.event-bar:hover {
+  opacity: 1;
+  filter: brightness(1.08);
+  z-index: 5;
+}
+
+/* ── Event dot (single-day) ──────────────────────────────────── */
+.event-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  cursor: pointer;
+  transform: translateX(-50%);
+  transition: transform .12s;
+  z-index: 1;
+}
+.event-dot:hover {
+  transform: translateX(-50%) scale(1.6);
+  z-index: 5;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────── */
+.tooltip {
+  position: fixed;
+  background: rgba(28, 28, 30, .92);
+  color: #fff;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 220px;
+  white-space: pre-line;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .app-header { padding: 0 14px; }
+  .app-subtitle { display: none; }
+  .year-view { padding: 12px 10px 30px; gap: 10px; }
+}

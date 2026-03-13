@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BetterCalendar</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── Header ─────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-left">
+      <span class="app-title">📅 BetterCalendar</span>
+      <span class="app-subtitle">Your year at a glance</span>
+    </div>
+    <div class="header-right">
+      <button id="signin-btn" class="btn btn-primary" disabled>Sign in with Google</button>
+      <button id="signout-btn" class="btn btn-secondary" style="display:none">Sign out</button>
+    </div>
+  </header>
+
+  <!-- ─── Calendar filter bar (shown after sign-in) ──────── -->
+  <div id="filter-section" class="filter-section" style="display:none">
+    <span class="filter-label">Calendars:</span>
+    <div id="calendar-list" class="calendar-filters"></div>
+    <button id="refresh-btn" class="btn btn-sm" title="Refresh events">⟳ Refresh</button>
+  </div>
+
+  <!-- ─── Main content ────────────────────────────────────── -->
+  <main id="main">
+
+    <!-- Welcome screen -->
+    <div id="welcome" class="welcome">
+      <div class="welcome-icon">📅</div>
+      <h2>Welcome to BetterCalendar</h2>
+      <p>A clean 12-month view of your travel &amp; events</p>
+      <p class="welcome-hint">Sign in with Google to get started</p>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="loading" class="loading" style="display:none">
+      <div class="spinner"></div>
+      <p>Loading your calendar…</p>
+    </div>
+
+    <!-- Error message -->
+    <div id="error-msg" class="error-msg" style="display:none"></div>
+
+    <!-- The 12-month grid -->
+    <div id="year-view" class="year-view"></div>
+
+  </main>
+
+  <!-- ─── Floating tooltip ─────────────────────────────────── -->
+  <div id="tooltip" class="tooltip" style="display:none"></div>
+
+  <!-- Load config first, then app logic, then Google scripts (async) -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()" async defer></script>
+
+</body>
+</html>
