@@ -20,7 +20,7 @@ A clean, 12-month year-at-a-glance view of your Google Calendar — built specif
 
 ## Setup — two parts
 
-> **🔒 Security note:** No API key is required. The only thing you put in `config.js` is your OAuth **Client ID**, which is intentionally public for client-side web apps — Google restricts it to only work from your authorised domain, so it cannot be misused by anyone who sees it in your repo.
+> **🔒 Security:** No API key required. Your OAuth **Client ID** is stored as a **GitHub repo secret** and injected into the site at deploy time by GitHub Actions — it never appears in your source code.
 
 ### Part 1 — Google Cloud credentials (~8 min, one time)
 
@@ -68,34 +68,30 @@ That's it — **no API key needed**.
 
 ---
 
-### Part 2 — Add credentials & deploy
+### Part 2 — Add the secret & enable GitHub Pages (no editing code!)
 
-#### Step 5 · Add your Client ID to config.js
+#### Step 5 · Add your Client ID as a repo secret
 
-Open `config.js` and replace the placeholder:
+1. Go to your GitHub repo → **Settings → Secrets and variables → Actions**
+2. Click **New repository secret**
+3. Name: `GOOGLE_CLIENT_ID`
+4. Secret: paste your Client ID (e.g. `123456789012-abcdefg.apps.googleusercontent.com`)
+5. Click **Add secret**
 
-```js
-const CONFIG = {
-  CLIENT_ID: 'YOUR_ACTUAL_CLIENT_ID.apps.googleusercontent.com',
-};
-```
+The deploy workflow (`.github/workflows/deploy.yml`) automatically injects this into `config.js` every time you push — the real value is never stored in your code.
 
-#### Step 6 · Commit and push your updated config.js
+#### Step 6 · Enable GitHub Pages via GitHub Actions
 
-```bash
-cd "/Users/msun/Desktop/Productivity Projects/BetterCalendar"
-git add config.js
-git commit -m "Add Google OAuth Client ID"
-git push
-```
+1. Go to your repo → **Settings → Pages**
+2. Under **Source**: select **GitHub Actions** *(not "Deploy from a branch")*
+3. Click **Save**
 
-#### Step 7 · Enable GitHub Pages
+#### Step 7 · Trigger your first deploy
 
-1. Go to your repo on GitHub → **Settings → Pages**
-2. Under **Source**: select **Deploy from a branch**
-3. Branch: **main** · Folder: **/ (root)** → **Save**
-4. Wait ~1 minute, then visit:
-   **`https://dynathresh.github.io/BetterCalendar`**
+Push any change to `main` (or go to **Actions → Deploy to GitHub Pages → Run workflow**).
+
+After ~1 minute your site will be live at:
+**`https://dynathresh.github.io/BetterCalendar`**
 
 ---
 
