@@ -515,3 +515,21 @@ document.addEventListener('DOMContentLoaded', () => {
     finally     { setLoading(false); }
   });
 });
+
+// ── Alt key: hold to reveal all event labels ──────────────────
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Alt') {
+    e.preventDefault(); // prevent browser menu (Firefox/Windows)
+    document.body.classList.add('labels-on');
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'Alt') {
+    document.body.classList.remove('labels-on');
+  }
+});
+// Safety: clear if window loses focus while Alt is held
+window.addEventListener('blur', () => {
+  document.body.classList.remove('labels-on');
+});
