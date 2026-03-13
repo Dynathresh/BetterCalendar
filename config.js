@@ -16,5 +16,5 @@
 const CONFIG = {
   // OAuth 2.0 Client ID  (Web application type)
   // Looks like:  123456789-abc...xyz.apps.googleusercontent.com
-  CLIENT_ID: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+  CLIENT_ID: '1075519823878-u0s3b6sjcskecka5acb01hhc68u47o2p.apps.googleusercontent.com',
 };
